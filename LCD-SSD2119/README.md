@@ -8,7 +8,6 @@
 The objective of this procedure is to familiarize ourselves with the LCD display and use the provided driver functions to change the color of the screen and modify the `LCD_PrintFloat()` function to display floating-point numbers.
 
 To achieve this, we used the `sprintf()` function to convert the float into a formatted string:
-```c
 sprintf(buffer, "%.2f", number);
 The %.2f format specifier ensures the number is rounded and displayed with exactly two digits after the decimal point.
 The resulting string is stored in a character buffer and then passed to LCD_PrintString(), which handles displaying the value on the LCD.
