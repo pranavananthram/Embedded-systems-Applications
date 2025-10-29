@@ -51,8 +51,27 @@ Temperature readings were successfully displayed via both the terminal and PuTTY
 Changing clock speeds produced corresponding temperature changes, validating proper timer and UART operation.
 
 ---
+### Project 3: LCD Display and Touchscreen Interface — TM4C Microcontroller
 
-## **Project 3 — UART Echo Communication**
+This project focused on developing an interactive LCD-based interface on the **TM4C1294NCPDT** microcontroller.  
+It was divided into three key stages:
+
+1. **Floating-Point Display:**  
+   Modified the `LCD_PrintFloat()` function using `sprintf()` to display floating-point values with two decimal precision. Implemented color control to dynamically update the LCD background.
+
+2. **Temperature Display:**  
+   Integrated the on-board ADC to measure the MCU’s internal temperature and displayed it in both **Celsius** and **Fahrenheit**. Added button-based PLL control (PJ0/PJ1) to switch the system clock between **12 MHz** and **120 MHz**, updating the display in real time.
+
+3. **Touchscreen Virtual Buttons:**  
+   Implemented virtual buttons on the resistive touchscreen to replace the onboard buttons. Touch inputs within defined coordinate ranges dynamically controlled the PLL frequency while providing visual feedback on the LCD.
+
+**Results:**
+
+- Accurate floating-point and temperature display on the LCD.  
+- Dynamic system clock switching with real-time feedback.  
+- Interactive touchscreen interface for hardware control.
+
+## **Project 4 — UART Echo Communication**
 
 ### **Overview**
 This project demonstrates UART-based serial communication by implementing a **real-time echo system**.  
@@ -80,9 +99,9 @@ The system successfully echoed every character sent from the terminal, confirmin
 | **Development Environment** | Keil µVision / Code Composer Studio (CCS) |
 | **Libraries** | TivaWare Peripheral Driver Library |
 | **Communication Tools** | PuTTY (Serial Terminal) |
-| **Interfaces Used** | ADC0, Timer0A, UART0, UART3, GPIO Ports A, F, J, N |
+| **Interfaces Used** | ADC0, Timer0A, UART0, UART3, GPIO Ports A, F, J, N, LCD (SSD2119), Resistive Touchscreen |
 | **System Clock Range** | 12 MHz – 120 MHz (PLL controlled) |
-| **Peripherals** | Potentiometer, LEDs, Onboard Temperature Sensor |
+| **Peripherals** | Potentiometer, LEDs, Onboard Temperature Sensor, 320x240 TFT LCD (SSD2119), Resistive Touchscreen |
 
 ---
 
@@ -91,8 +110,11 @@ The system successfully echoed every character sent from the terminal, confirmin
 - Timer-triggered sampling and interrupt handling  
 - GPIO configuration and LED control  
 - UART initialization and serial communication  
+- LCD SSD2119 display control (drawing, color management, text output)  
+- Touchscreen input handling for virtual buttons and interactive control 
+- Floating-point data formatting and display  
 - Clock frequency scaling with PLL  
-- Temperature sensing and real-time data output  
+- Real-time hardware feedback and user interaction  
 
 ---
 
