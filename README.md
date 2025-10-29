@@ -96,7 +96,7 @@ The system successfully echoed every character sent from the terminal, confirmin
 | Category | Details |
 |-----------|----------|
 | **Microcontroller** | TI TM4C1294NCPDT (Tiva C Series LaunchPad) |
-| **Development Environment** | Keil µVision / Code Composer Studio (CCS) |
+| **Development Environment** |IAR Embedded Workbench/ Keil µVision / Code Composer Studio (CCS) |
 | **Libraries** | TivaWare Peripheral Driver Library |
 | **Communication Tools** | PuTTY (Serial Terminal) |
 | **Interfaces Used** | ADC0, Timer0A, UART0, UART3, GPIO Ports A, F, J, N, LCD (SSD2119), Resistive Touchscreen |
