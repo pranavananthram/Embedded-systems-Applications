@@ -1,3 +1,4 @@
+
 /**************************************************
  *
  * This file contains an interrupt vector for Cortex-M written in C.
@@ -29,6 +30,7 @@ extern void PendSV_Handler( void );
 extern void SysTick_Handler( void );
 
 extern void ADC0SS3_Handler( void );
+extern void GPIOPortJ_Handler(void);
 
 
 
@@ -84,6 +86,7 @@ const intvec_elem __vector_table[] =
   ADC0SS3_Handler,                        // ADC Sequence 3
   0,
   0,
+  0, 
   0,
   0,
   0,
@@ -93,6 +96,7 @@ const intvec_elem __vector_table[] =
   0,
   0,
   0,
+  0, 
   0,
   0,
   0,
@@ -102,6 +106,7 @@ const intvec_elem __vector_table[] =
   0,
   0,
   0,
+  0, 
   0,
   0,
   0,
@@ -111,73 +116,9 @@ const intvec_elem __vector_table[] =
   0,
   0,
   0,
+  0, 
   0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
+  GPIOPortJ_Handler
 };
 
 #pragma call_graph_root = "interrupt"
@@ -202,7 +143,8 @@ __weak void SysTick_Handler( void ) { while (1) {} }
 #pragma call_graph_root = "interrupt"
 __weak void ADC0SS3_Handler ( void ) { while (1) {} }
 
-
+#pragma call_graph_root = "interrupt"
+__weak void PortJ_Handler ( void ) { while (1) {} }
 void __cmain( void );
 __weak void __iar_init_core( void );
 __weak void __iar_init_vfp( void );
@@ -214,5 +156,4 @@ void __iar_program_start( void )
   __iar_init_vfp();
   __cmain();
 }
-
 
