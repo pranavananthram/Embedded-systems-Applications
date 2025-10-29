@@ -1,27 +1,78 @@
-Task 1:
-Part A:
-The objective of this task was to use the general-purpose timers that are provided to count or drive events, such as being able to toggle the on-board LEDs in a periodic pattern. For this procedure, we are toggling the LEDs one at a time such that it strobes at a rate of 1 Hz with one LED lighting up, switching off as the next LED simultaneously switches on. For the first task we followed the recommended procedure and enabled the appropriate timer bits so that we can use the timer periodically. The program uses Timer 0A to create a 1-second delay between toggling each output pin. Timer 0 is initialized in 32-bit periodic mode, counting up to a reload value of 16,000,000, which corresponds to 1 second at a 16 MHz system clock. This timer configuration ensures precise 1-second timing intervals without busy-wait loops. Within the main loop, the strobe() function is called sequentially for each pin (PF0, PF4, PN0, PN1). 
-Results: 
-Using the above method, we can successfully strobe the LEDs successively with a rate of 1 Hz as the hardware timer enables us to increment one second by counting to 16 millions on a 16MHz clock. And upon each strobe of an LED, we reset the timer to enable the LEDs to count up accurately, thus allowing us to activate one LED successively without any irregular delays or timing.
-Part B:
-The objective of this procedure is to implement the timed traffic light system we developed in Lab 1. For the previous implementation, we added a module known as delay_loop which worked as follows: 
-Code snippet:
-volatile unsigned long j;
-    for (j = 0; j < 1000000; j++) { // adds a delay of 0.3 second
-    }
-As seen above, this code is inefficient in terms of CPU processing and does not make use of any hardware timers. For this procedure, we primarily focused on replacing this approach with an actual module that works as a timer and is able to count the time accurately while saving processing power. The approach we used to set a consistent hardware timer was to declare a timer0_init() function sets up Timer 0A by enabling its clock, disabling the timer during configuration, setting it to 32-bit mode, and configuring it for periodic, count-down operation. The timer0_wait_seconds() function implements a blocking delay in seconds by loading the timer with a value equal to seconds × 16,000,000, starting the timer, waiting for the timeout flag (TATOI) to be set, and then clearing the flag and stopping the timer. This enables us to keep track of every second and by creating further modules that use this timer, we can use it to keep track of 2 seconds and only passing a button-press if it was held for that duration. Additionally, previously we used a delay between the state transitions using a for-loop, but by simply allowing the timer to count to 5 seconds, we can enable a 5 second delay in every state transition. 
-Results:
-We were able to successfully implement a timed traffic light that used a timer to ensure button-presses last 2 seconds and that state transitions occur every 5 seconds. We also fixed the functionality of the finite state machine used in previous lab and added a transition between the warn (yellow light) and stop (red light) state after the code enters the warn state. 
- 
-Task 2:
-The objective of this procedure is to replace the previous timer-based approach and using a more efficient for CPU processing approach using interrupts. We begin by initializing a vector table which is a table of pointers to routines that handle interrupts. We access the standard default vector table using a downloaded version known as cstartup_M. This file enables us to find an initial stack pointer and interrupt service routines that the processor jumps to when an interrupt occurs. We primarily use Timer0A_handler (located at vector 35) which acts as an interrupt line for our code. In our cstartup_M code we also declared it as a weak implementation, this makes it so that the module can be defined elsewhere and if an interrupt occurs or an exception occurs it will be implemented, and we can edit the timer module for our needs. 
-Part A:
-We repeat the procedure in Task 1 Part A but we replace the timer module with an interrupt to handle the LED behavior. This program uses Timer 0A and IRQ 19 to create an interrupt-driven GPIO strobing sequence. GPIO pins PF0, PF4, PN0, and PN1 are configured as outputs, and Timer 0A is set to generate a 1-second timeout interrupt using 32-bit periodic mode. The strobe() function sets a pin high and starts the timer, while Timer0A_Handler()—declared in the vector table via cstartup_M clears the interrupt, sets the pin low, advances to the next pin, and restarts the strobe. The process cycles through the four pins, each toggled high for one second. The main loop remains empty, as all logic is handled via interrupts for efficient, non-blocking operation.
-Result:
-Using the above approach, we are able to write highly efficient hardware operation that does not interrupt the CPU processing and will sequentially strobe the lights at expected intervals. This approach does not create any delays in the code and effectively jogs the system to switch on/ off the LEDs on each interrupt call. 
-Part B:
-The objective of this procedure is to control the timers using a GPIO switch. Specifically, we are implementing the strobing lights and controlling them using a GPIO switch. We are using input pins PJ0 and PJ1, and using them to control lights PN0 and PN1. We first implement the timer such that LED PN0 is strobing at a rate of 1 Hz using the interrupt-timer approach, and when a user interrupt is passed using switch PJ0, the LED PN0 will stop strobing and switch off and LED2 PN1 will switch on until PJ1 is enabled using an interrupt at which point the timer will reset and go back to strobing  PN0. 
-Part C:
-The objective of this procedure is to repeat Task 1 Part B of Lab 2 and implement the timed traffic controller using interrupts. We implemented the same control logic but replaced the timer module and used the cstartup_M module to declare interrupts to use for the time traffic lights. We configured Timer0A to generate a 1 millisecond periodic interrupt, which is used to maintain a global system_time_ms counter. The timer0_init() function sets up Timer0A in 32-bit, periodic, count-down mode with a value of 16,000 (for 1ms at 16 MHz), enables the timeout interrupt, and sets its NVIC priority. In the Timer0A_Handler(), the system time is incremented every millisecond, and a local counter tracks 5-second intervals, setting a timer_expired flag when reached. Utility functions like timer0_wait_ms() and timer0_wait_seconds() provide non-blocking delays by referencing system_time_ms, while button_held() checks if a button remains pressed for a duration of 2 seconds, also using the global time. The system efficiently tracks time and button states using interrupts.
-Results:
-Using the same logic as implemented in task 1, we were able to replicate the exact behavior seen with timers and efficiently control the 5 second delay in every state transition and respond to user-interrupts by checking if the button was held for 2 seconds thus providing the expected functionality.
+# Embedded Systems Lab — Timer and Interrupt Implementation
+
+This project demonstrates the use of **hardware timers** and **interrupts** on the TM4C1294NCPDT microcontroller to drive LEDs and implement a timed traffic light controller.  
+The work is divided into two major tasks: implementing timer-based control and interrupt-driven control.
+
+---
+
+## Task 1: Timer-Based Implementation
+
+### Part A: LED Strobing Using Hardware Timers
+
+#### Objective
+Use a **general-purpose hardware timer** to toggle the on-board LEDs at a 1 Hz rate, such that each LED lights up in sequence.
+
+#### Procedure
+- **Timer Used:** Timer 0A  
+- **Mode:** 32-bit periodic, count-up  
+- **Clock:** 16 MHz  
+- **Reload Value:** 16,000,000 → corresponds to a 1 second delay  
+
+The program configures Timer 0A to generate precise 1-second intervals without busy-wait loops.  
+Within the main loop, the `strobe()` function sequentially activates the LEDs on pins **PF0**, **PF4**, **PN0**, and **PN1**, turning one LED on as the previous turns off.
+
+#### Results
+The LEDs successfully strobe at a rate of 1 Hz.  
+Each LED lights for exactly one second, verified through the 16 MHz clock and hardware timer accuracy.  
+The timer reset ensures consistent and drift-free toggling with no irregular delays.
+
+---
+
+### Part B: Interrupt-Driven LED Control Using GPIO Switches
+
+#### Objective
+The goal of this task is to control the LED strobing behavior using **GPIO switches** with **interrupt-driven logic**.
+
+#### Procedure
+- **Input pins:** PJ0 and PJ1  
+- **Output pins:** PN0 and PN1  
+
+The behavior is implemented as follows:
+1. LED **PN0** strobes at a rate of **1 Hz** using the Timer 0A interrupt.  
+2. When the user presses **PJ0** (triggering a GPIO interrupt), LED PN0 stops strobing and switches off. At this point, **PN1** turns on and remains lit.  
+3. When the user presses **PJ1**, LED PN1 switches off, the timer resets, and **PN0** resumes strobing at 1 Hz.  
+
+This setup uses the same interrupt mechanism as in Part A, but adds **external input interrupts** to dynamically change LED behavior.
+
+#### Results
+This implementation successfully enables real-time LED control using GPIO inputs.  
+The LEDs respond instantly to button presses while the interrupt system maintains efficient, non-blocking background operation.  
+The result is a clean, hardware-driven LED control system that demonstrates the integration of **timers**, **interrupts**, and **GPIO event handling**.
+
+### Part C: Interrupt-Based Timed Traffic Light Controller
+
+#### Objective
+The objective of this procedure is to recreate the timed traffic controller from Task 1 Part B using **interrupts** for timekeeping instead of blocking delays, resulting in an efficient, event-driven implementation.
+
+#### Procedure
+- **Timer 0A Configuration:**
+  - Mode: 32-bit periodic, count-down  
+  - Load value: 16,000 → produces **1 ms** intervals at a 16 MHz system clock  
+  - Interrupt enabled every 1 ms (handled by `Timer0A_Handler`)  
+
+- **Interrupt Handler (`Timer0A_Handler`):**
+  - Increments a global `system_time_ms` counter on every interrupt.  
+  - Tracks 5-second intervals using a local counter.  
+  - Sets a `timer_expired` flag whenever 5 seconds elapse.
+
+- **Utility Functions:**
+  - `timer0_wait_ms()` and `timer0_wait_seconds()` — provide **non-blocking delays** based on `system_time_ms`.  
+  - `button_held()` — determines whether a button is pressed continuously for 2 seconds using the same timing reference.
+
+This approach allows the traffic light FSM to maintain accurate timing for both **5-second state transitions** and **2-second button-press detection**, all handled via interrupts rather than delay loops.
+
+#### Results
+The interrupt-driven traffic light controller accurately replicates the behavior of the timer-based version.  
+It performs seamless **5-second state transitions**, correctly detects **2-second button holds**, and operates entirely **non-blockingly**.  
+This design showcases an efficient use of interrupts for real-time system control while maintaining precise timing and responsiveness.
+
