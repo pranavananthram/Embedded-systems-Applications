@@ -16,6 +16,7 @@ The resulting string is stored in a character buffer and then passed to LCD_Prin
 
 We successfully printed floating-point numbers on the LCD and verified the implementation with various test values.
 Additionally, we changed the LCD background color using the provided functions:
+```c
 int main(void) {
   LCD_Init();    
   LCD_ColorFill(Color4[5]); // Changed the color to magenta
@@ -23,6 +24,7 @@ int main(void) {
   while (1) {}
   return 0;
 }
+```
 This functionality was later reused for displaying temperature values.
 
 ---
