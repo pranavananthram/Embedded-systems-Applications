@@ -1,4 +1,4 @@
-# ⚙️ Embedded Systems Projects — TM4C1294NCPDT
+# Embedded Systems Projects — TM4C1294NCPDT
 
 This repository contains a series of embedded systems design projects implemented on the **Texas Instruments TM4C1294NCPDT (Tiva C Series LaunchPad)**.  
 Each project explores a different aspect of microcontroller-based system design, including **ADC integration**, **timer-based interrupts**, **UART communication**, and **temperature sensing**.  
